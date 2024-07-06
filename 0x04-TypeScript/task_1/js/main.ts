@@ -18,8 +18,8 @@ export function printTeacher(firstName: string, lastName: string): string {
   return `${firstName.charAt(0)}. ${lastName}`;
 }
 
-export interface classConstructor {
-  new (firstName: string, lastName:string): StudentClassInterface;
+export interface StudentConstructor {
+  new(firstName: string, lastName:string): StudentClassInterface;
 }
 
 export interface StudentClassInterface {
@@ -29,11 +29,11 @@ export interface StudentClassInterface {
 
 export class StudentClass {
   firstName: string;
- lastName: string;
+  lastName: string;
 
   constructor(firstName: string, lastName: string) {
     this.firstName = firstName;
-    this.lastName = firstName;
+    this.lastName = lastName;
   }
 
   workOnHomework() {
