@@ -1,63 +1,46 @@
 const fs = require('fs');
 
 /**
- * Counts students by field and logs the results.
- * @param {string} path - Path to the CSV file.
- * @throws {Error} Throws an error with the message "Cannot load the database" if the file cannot be read.
+ * Counts the students in a CSV data file.
+ * @param {String} dataPath The path to the CSV data file.
+ * @author Eric Uwiringiyimana
  */
-function countStudents(path) {
-  try {
-    // Read the file content synchronously
-    const data = fs.readFileSync(path, 'utf8');
-
-    // Split the content into lines and process the CSV data
-    const lines = data.split('\n').filter(line => line.trim() !== ''); // Filter out empty lines
-
-    if (lines.length === 0) {
-      throw new Error('Cannot load the database');
-    }
-
-    // Extract header and rows
-    const [header, ...rows] = lines;
-
-    // Parse the header to find the column indices
-    const [firstnameHeader, lastnameHeader, ageHeader, fieldHeader] = header.split(',').map(col => col.trim());
-    if (firstnameHeader !== 'firstname' || lastnameHeader !== 'lastname' || ageHeader !== 'age' || fieldHeader !== 'field') {
-      throw new Error('Cannot load the database');
-    }
-
-    const fieldData = {};
-
-    // Process each row
-    rows.forEach(row => {
-      const [firstname, lastname, age, field] = row.split(',').map(cell => cell.trim());
-
-      // Skip if any field is missing
-      if (firstname && lastname && age && field) {
-        if (!fieldData[field]) {
-          fieldData[field] = { count: 0, names: [] };
-        }
-
-        fieldData[field].count += 1;
-        fieldData[field].names.push(firstname);
-      }
-    });
-
-    // Calculate total number of students
-    const totalStudents = Object.values(fieldData).reduce((acc, data) => acc + data.count, 0);
-
-    // Log total number of students
-    console.log(`Number of students: ${totalStudents}`);
-
-    // Log number of students per field and their names
-    for (const [field, data] of Object.entries(fieldData)) {
-      console.log(`Number of students in ${field}: ${data.count}. List: ${data.names.join(', ')}`);
-    }
-
-  } catch (error) {
-    // Throw a new error with the message "Cannot load the database"
+const countStudents = (dataPath) => {
+  if (!fs.existsSync(dataPath)) {
     throw new Error('Cannot load the database');
   }
-}
+  if (!fs.statSync(dataPath).isFile()) {
+    throw new Error('Cannot load the database');
+  }
+  const fileLines = fs
+    .readFileSync(dataPath, 'utf-8')
+    .toString('utf-8')
+    .trim()
+    .split('\n');
+  const studentGroups = {};
+  const dbFieldNames = fileLines[0].split(',');
+  const studentPropNames = dbFieldNames.slice(0, dbFieldNames.length - 1);
+
+  for (const line of fileLines.slice(1)) {
+    const studentRecord = line.split(',');
+    const studentPropValues = studentRecord.slice(0, studentRecord.length - 1);
+    const field = studentRecord[studentRecord.length - 1];
+    if (!Object.keys(studentGroups).includes(field)) {
+      studentGroups[field] = [];
+    }
+    const studentEntries = studentPropNames
+      .map((propName, idx) => [propName, studentPropValues[idx]]);
+    studentGroups[field].push(Object.fromEntries(studentEntries));
+  }
+
+  const totalStudents = Object
+    .values(studentGroups)
+    .reduce((pre, cur) => (pre || []).length + cur.length);
+  console.log(`Number of students: ${totalStudents}`);
+  for (const [field, group] of Object.entries(studentGroups)) {
+    const studentNames = group.map((student) => student.firstname).join(', ');
+    console.log(`Number of students in ${field}: ${group.length}. List: ${studentNames}`);
+  }
+};
 
 module.exports = countStudents;
