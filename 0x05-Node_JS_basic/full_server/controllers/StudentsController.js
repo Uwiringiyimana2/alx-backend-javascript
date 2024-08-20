@@ -1,19 +1,22 @@
 import readDatabase from '../utils';
 
-/*
- *  StudentsController class
+/**
+ * The list of supported majors.
  */
+const VALID_MAJORS = ['CS', 'SWE'];
 
-const VALID_MAJORS = ['CS', 'SW'];
-
+/**
+ * Contains the student-related route handlers.
+ * @author Bezaleel Olakunori <https://github.com/B3zaleel>
+ */
 class StudentsController {
   static getAllStudents(request, response) {
-    const datapath = process.argv.length > 2 ? process.argv[2] : "";
+    const dataPath = process.argv.length > 2 ? process.argv[2] : '';
 
-    readDatabase(datapath)
+    readDatabase(dataPath)
       .then((studentGroups) => {
         const responseParts = ['This is the list of our students'];
-	// A comparison function for ordering a list of strings in ascending
+        // A comparison function for ordering a list of strings in ascending
         // order by alphabetic order and case insensitive
         const cmpFxn = (a, b) => {
           if (a[0].toLowerCase() < b[0].toLowerCase()) {
@@ -40,7 +43,7 @@ class StudentsController {
           .send(err instanceof Error ? err.message : err.toString());
       });
   }
-  
+
   static getAllStudentsByMajor(request, response) {
     const dataPath = process.argv.length > 2 ? process.argv[2] : '';
     const { major } = request.params;
