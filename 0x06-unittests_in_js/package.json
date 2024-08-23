@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "node code testing",
   "main": "0-calcul.js",
+  "type": "module",
   "scripts": {
     "test": "mocha"
   },
@@ -17,6 +18,8 @@
   },
   "homepage": "https://github.com/Uwiringiyimana2/alx-backend-javascript#readme",
   "devDependencies": {
-    "mocha": "^10.7.3"
+    "chai": "^5.1.1",
+    "mocha": "^10.7.3",
+    "sinon": "^18.0.0"
   }
 }
